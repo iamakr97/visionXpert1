@@ -13,7 +13,7 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 model = tf.keras.applications.MobileNetV2(weights='imagenet')
 
 # Load the fish disease classification model
-fish_classification_model = tf.keras.models.load_model('./model2 _RGB.keras')  
+fish_classification_model = tf.keras.models.load_model('./model2 _RGB.keras')
 
 
 if not os.path.exists('uploads'):
@@ -58,10 +58,17 @@ def upload_file():
             } for pred in decoded_predictions[0]
         ]
     }
+    # Delete the uploaded file after processing
+    try:
+        os.remove(filepath)
+    except OSError as e:
+        print(f"Error deleting file {filepath}: {e}")
 
     return jsonify(result), 200
 
 # Route for fish disease classification
+
+
 @app.route('/fish-classification', methods=['POST'])
 def fish_classification():
     if 'file' not in request.files:
@@ -85,6 +92,12 @@ def fish_classification():
         "confidence": confidence
     }
 
+    # Delete the uploaded file after processing
+    try:
+        os.remove(filepath)
+    except OSError as e:
+        print(f"Error deleting file {filepath}: {e}")
+
     return jsonify(result), 200
 
 
@@ -92,6 +105,6 @@ def fish_classification():
 def index():
     return "Flask app is running"
 
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=os.environ.get('PORT', 5000))
-
